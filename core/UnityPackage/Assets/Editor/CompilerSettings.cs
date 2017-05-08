@@ -46,7 +46,10 @@ public class CompilerSettings : EditorWindow
         public PrebuiltOutputReuseType PrebuiltOutputReuse;
     }
 
-    private readonly string[] BuildTargets = { "Assembly-CSharp-firstpass", "Assembly-CSharp", "Assembly-CSharp-Editor" };
+    /// <summary>
+    /// 这里依赖了编译顺序，注意顺序
+    /// </summary>
+    private readonly string[] BuildTargets = { "Assembly-CSharp-firstpass", "Assembly-CSharp", "Assembly-CSharp-Editor-firstpass", "Assembly-CSharp-Editor" };
     private const string UcsFilePath = "./Compiler/UniversalCompiler.xml";
     private const string UcLogFilePath = "./Temp/UniversalCompiler.log";
     private const string IcsFilePath = "./Compiler/IncrementalCompiler.xml";
@@ -105,7 +108,7 @@ public class CompilerSettings : EditorWindow
         GUILayout.Label("Last Build Time");
         EditorGUI.indentLevel += 1;
         for (var i=0; i< BuildTargets.Length; i++)
-            EditorGUILayout.LabelField("Assembly" + BuildTargets[i].Substring(15), durations[i]);
+            EditorGUILayout.LabelField(string.Format("{0, -60}{1}", BuildTargets[i], durations[i]));
         EditorGUI.indentLevel -= 1;
     }
 
@@ -184,7 +187,7 @@ public class CompilerSettings : EditorWindow
         if (icsLastWriteTime == _icsLastWriteTime)
             return _ucLastBuildLog;
 
-        _ucLastBuildLog = new[] {"", "", ""};
+        _ucLastBuildLog = new string[BuildTargets.Length];
         if (!File.Exists(UcLogFilePath)) {
             return _ucLastBuildLog;
         }
